@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var isNight = false
+    
     var body: some View {
         ZStack {
-            BackgroundView(topColor: .blue, bottomColor: Color("lightBlue"))
+            BackgroundView(isNight: $isNight)
             
             VStack(spacing: 20) {
                 CityTextView(cityName: "Amsterdam, NL")
-                MainWeatherStatusView(imageName: "cloud.sun.fill", temperature: 23)
+                MainWeatherStatusView(imageName: isNight ? "moon.stars.fill" : "cloud.sun.fill", temperature: 23)
                 HStack(spacing: 30) {
                     WeatherDayView(
                         dayOfWeek: "TUE",
@@ -40,8 +42,14 @@ struct ContentView: View {
                 
                 Spacer()
                 
-                WeatherButton(title: "Change Day Time", textColor: .blue, backgroundColor: .white)
-                
+                Button {
+                    isNight.toggle()
+                } label: {
+                    WeatherButton(
+                        title: "Change Day Time",
+                        textColor: .blue,
+                        backgroundColor: .white)
+                }
                 Spacer()
             }
         }
@@ -77,12 +85,12 @@ struct WeatherDayView: View {
 }
 
 struct BackgroundView: View {
-    var topColor: Color
-    var bottomColor: Color
+    @Binding var isNight: Bool
     
     var body: some View {
         LinearGradient(
-            gradient: Gradient(colors: [topColor, bottomColor]),
+            gradient: Gradient(
+                colors: [isNight ? .black : .blue, isNight ? .gray : Color("lightBlue")]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
     }
@@ -123,15 +131,11 @@ struct WeatherButton: View {
     var backgroundColor: Color
     
     var body: some View {
-        Button {
-            print("tapped")
-        } label: {
-            Text(title)
-                .frame(width: 280, height: 50)
-                .background(backgroundColor)
-                .foregroundColor(textColor)
-                .font(.system(size: 20, weight: .bold, design: .default))
-                .cornerRadius(10)
-        }
+        Text(title)
+            .frame(width: 280, height: 50)
+            .background(backgroundColor)
+            .foregroundColor(textColor)
+            .font(.system(size: 20, weight: .bold, design: .default))
+            .cornerRadius(10)
     }
 }
